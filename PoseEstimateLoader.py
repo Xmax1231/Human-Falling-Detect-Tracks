@@ -36,4 +36,5 @@ class SPPE_FastPose(object):
         xy_hm, xy_img, scores = getPrediction(pose_hm, pt1, pt2, self.inp_h, self.inp_w,
                                               pose_hm.shape[-2], pose_hm.shape[-1])
         result = pose_nms(bboxs, bboxs_scores, xy_img, scores)
+
         return result

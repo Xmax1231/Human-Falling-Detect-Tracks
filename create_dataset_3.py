@@ -15,8 +15,8 @@ main_parts = ['LShoulder_x', 'LShoulder_y', 'RShoulder_x', 'RShoulder_y', 'LHip_
               'RHip_x', 'RHip_y']
 main_idx_parts = [1, 2, 7, 8, -1]  # 1.5
 
-csv_pose_file = '../Data/Coffee_room_new-pose+score.csv'
-save_path = '../../Data/Coffee_room_new-set(labelXscrw).pkl'
+csv_pose_file = 'Data/Home_new-pose+score.csv'
+save_path = 'Data/Home_new-set(labelXscrw).pkl'
 
 # Params.
 smooth_labels_step = 8
@@ -123,5 +123,5 @@ for vid in vid_list:
             labels_set = np.append(labels_set, lb[i:i+n_frames].mean(0)[None, ...], axis=0)
 
 
-"""with open(save_path, 'wb') as f:
-    pickle.dump((feature_set, labels_set), f)"""
+with open(save_path, 'wb') as f:
+    pickle.dump((feature_set, labels_set), f)

@@ -20,11 +20,11 @@ from DetectorLoader import TinyYOLOv3_onecls
 from PoseEstimateLoader import SPPE_FastPose
 from fn import vis_frame_fast
 
-save_path = '../../Data/Home_new-pose+score.csv'
+save_path = 'Data/Home_new-pose+score.csv'
 
-annot_file = '../../Data/Home_new.csv'  # from create_dataset_1.py
-video_folder = '../Data/falldata/Home/Videos'
-annot_folder = '../Data/falldata/Home/Annotation_files'  # bounding box annotation for each frame.
+annot_file = 'Data/Home_new.csv'  # from create_dataset_1.py
+video_folder = 'Data/falldata/Home/Videos'
+annot_folder = 'Data/falldata/Home/Annotation_files'  # bounding box annotation for each frame.
 
 # DETECTION MODEL.
 detector = TinyYOLOv3_onecls()
@@ -32,7 +32,7 @@ detector = TinyYOLOv3_onecls()
 # POSE MODEL.
 inp_h = 320
 inp_w = 256
-pose_estimator = SPPE_FastPose(inp_h, inp_w)
+pose_estimator = SPPE_FastPose('resnet50', inp_h, inp_w)
 
 # with score.
 columns = ['video', 'frame', 'Nose_x', 'Nose_y', 'Nose_s', 'LShoulder_x', 'LShoulder_y', 'LShoulder_s',
@@ -51,15 +51,15 @@ def normalize_points_with_size(points_xy, width, height, flip=False):
     return points_xy
 
 
-annot = pd.read_csv(annot_file)
-vid_list = annot['video'].unique()
+G_annot = pd.read_csv(annot_file)
+vid_list = G_annot['video'].unique()
 for vid in vid_list:
     print(f'Process on: {vid}')
     df = pd.DataFrame(columns=columns)
     cur_row = 0
 
     # Pose Labels.
-    frames_label = annot[annot['video'] == vid].reset_index(drop=True)
+    frames_label = G_annot[G_annot['video'] == vid].reset_index(drop=True)
 
     cap = cv2.VideoCapture(os.path.join(video_folder, vid))
     frames_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -87,7 +87,10 @@ for vid in vid_list:
             if annot:
                 bb = np.array(annot.iloc[i-1, 2:].astype(int))
             else:
-                bb = detector.detect(frame)[0, :4].numpy().astype(int)
+                detect_result = detector.detect(frame)
+                if detect_result == None:
+                    continue
+                bb = detect_result[0, :4].numpy().astype(int)
             bb[:2] = np.maximum(0, bb[:2] - 5)
             bb[2:] = np.minimum(frame_size, bb[2:] + 5) if bb[2:].any() != 0 else bb[2:]
 
